@@ -2,6 +2,31 @@
 <html>
 <head>
     <title>Test</title>
+    <style type="text/css">
+    .trans-area b{
+        display: inline-block;
+        min-width: 80px;
+    }
+    .trans-area input{
+        margin-right: 10px;
+        min-width: 200px;
+        vertical-align: baseline;
+    }
+    #transform{
+        min-width: 150px;
+        height: 35px;
+        background: #d74717;
+        border: none;
+        color: #ffffff;
+        letter-spacing: 1px;
+    }
+    #transform:hover{
+        background: #df4f1e;
+    }
+    input::-webkit-input-placeholder {color:#ccc;}
+    input::-moz-placeholder {color:#ccc;}
+    input::-ms-input-placeholder {color:#ccc;}
+</style>
 </head>
 <body>
     <xmp theme="united">
@@ -462,13 +487,88 @@ This standard defines two method types:
 ### Appendix B: Tools
     </xmp>
     <div class="container">
-        <form>
-            Address: <input type="text" name="address">
-            <br> 
-            Script Hash: <input type="text" name="script_hash">
+        <form class="trans-area">
+            <div>
+                <b>String</b>：
+                <input id="inString" type="text" placeholder="7472616e73666572" />----> Type ：
+                <span id="outString"></span>
+            </div>
+            <div>
+                <b>Script Hash</b>：
+                <input id="inHash" type="text" placeholder="d336d7eb9975a29b2404fdb28185e277a4b299bc" />----> Address ：
+                <span id="outHash"></span>
+            </div>
+            <div>
+                <b>Address</b>：
+                <input id="inAddress" type="text" placeholder="AeV59NyZtgj5AMQ7vY6yhr2MRvcfFeLWSb" />----> Script Hash ：
+                <span id="outAddress"></span>
+            </div>
+            <div>
+                <b>Number</b>：
+                <input id="inCount" type="text" placeholder="006ad42d100100" />----> Amount ： 
+                <span id="outCount"></span>
+            </div>
+
+            <input id="transform" type="button" value="Transform">
         </form>
     </div>
-</body>
-<script src="http://strapdownjs.com/v/0.2/strapdown.js"></script>
 
+    <script src="http://strapdownjs.com/v/0.2/strapdown.js"></script>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/bundleDemo.js"></script>
+    <script>
+        $(function () {
+        var Trans = (function () {
+            function Trans() {
+            }
+            Trans.hexToString = function (hex) {
+                var trimhex = hex.trim();
+                var rawStr = trimhex.substr(0, 2).toLowerCase() === "0x" ? trimhex.substr(2) : trimhex;
+                var len = rawStr.length;
+                if (len % 2 !== 0) {
+                    alert("Illegal Format ASCII Code!");
+                    return "";
+                }
+                var cuChar;
+                var result = [];
+                for (var i = 0; i < len; i = i + 2) {
+                    cuChar = parseInt(rawStr.substr(i, 2), 16);
+                    result.push(String.fromCharCode(cuChar));
+                }
+                return result.join("");
+            };
+            Trans.prototype.hexToString = function (hex) {
+                return Trans.hexToString(hex);
+            };
+            return Trans;
+        }());
+        $("#transform").click(function () {
+            var inStr = $("#inString").val();
+            if (inStr) {
+                var outStr = Trans.hexToString(inStr);
+                $("#outString").text(outStr);
+            }
+            var inHa = $("#inHash").val();
+            if (inHa && AntShares.Uint160.parse(inHa)) {
+                var hash160 = AntShares.Uint160.parse(inHa);
+                AntShares.Wallets.Wallet.toAddress(hash160).then(function (val) {
+                    $("#outHash").text(val);
+                });
+            }
+            var inAdd = $("#inAddress").val();
+            if (inAdd) {
+                AntShares.Wallets.Wallet.toScriptHash(inAdd).then(function (val) {
+                    $("#outAddress").text(val.toString());
+                });
+            }
+            var inCou = $("#inCount").val();
+            if (inCou) {
+                var num = inCou.hexToBytes();
+                var a = new AntShares.BigInteger(num);
+                $("#outCount").text(a.toString());
+            }
+        });
+    });
+    </script>
+</body>
 </html>
