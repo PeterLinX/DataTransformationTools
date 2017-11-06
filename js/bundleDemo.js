@@ -812,6 +812,99 @@ var AntShares;
                 window.crypto.getRandomValues = Cryptography.RandomNumberGenerator.getRandomValues;
             }
         }
+        if (window.crypto.subtle == null) {
+            window.crypto.subtle = {
+                decrypt: function (algorithm, key, data) { return new Promise(function (resolve, reject) {
+                    if (typeof algorithm === "string" || algorithm.name != "AES-CBC" || !algorithm.iv || algorithm.iv.byteLength != 16 || data.byteLength % 16 != 0) {
+                        reject(new RangeError());
+                        return;
+                    }
+                    try {
+                        var aes = new Cryptography.Aes(key.export(), algorithm.iv);
+                        resolve(aes.decrypt(data));
+                    }
+                    catch (e) {
+                        reject(e);
+                    }
+                }); },
+                deriveBits: null,
+                deriveKey: null,
+                digest: function (algorithm, data) { return new Promise(function (resolve, reject) {
+                    if (getAlgorithmName(algorithm) != "SHA-256") {
+                        reject(new RangeError());
+                        return;
+                    }
+                    try {
+                        resolve(Cryptography.Sha256.computeHash(data));
+                    }
+                    catch (e) {
+                        reject(e);
+                    }
+                }); },
+                encrypt: function (algorithm, key, data) { return new Promise(function (resolve, reject) {
+                    if (typeof algorithm === "string" || algorithm.name != "AES-CBC" || !algorithm.iv || algorithm.iv.byteLength != 16) {
+                        reject(new RangeError());
+                        return;
+                    }
+                    try {
+                        var aes = new Cryptography.Aes(key.export(), algorithm.iv);
+                        resolve(aes.encrypt(data));
+                    }
+                    catch (e) {
+                        reject(e);
+                    }
+                }); },
+                exportKey: function (format, key) { return new Promise(function (resolve, reject) {
+                    if (format != "jwk" || !(key instanceof Cryptography.AesCryptoKey)) {
+                        reject(new RangeError());
+                        return;
+                    }
+                    try {
+                        var k = key;
+                        resolve({
+                            alg: "A256CBC",
+                            ext: true,
+                            k: k.export().base64UrlEncode(),
+                            key_ops: k.usages,
+                            kty: "oct"
+                        });
+                    }
+                    catch (e) {
+                        reject(e);
+                    }
+                }); },
+                generateKey: function (algorithm, extractable, keyUsages) { return new Promise(function (resolve, reject) {
+                    if (typeof algorithm === "string" || algorithm.name != "AES-CBC" || (algorithm.length != 128 && algorithm.length != 192 && algorithm.length != 256)) {
+                        reject(new RangeError());
+                        return;
+                    }
+                    try {
+                        resolve(Cryptography.AesCryptoKey.create(algorithm.length));
+                    }
+                    catch (e) {
+                        reject(e);
+                    }
+                }); },
+                importKey: function (format, keyData, algorithm, extractable, keyUsages) { return new Promise(function (resolve, reject) {
+                    if ((format != "raw" && format != "jwk") || getAlgorithmName(algorithm) != "AES-CBC") {
+                        reject(new RangeError());
+                        return;
+                    }
+                    try {
+                        if (format == "jwk")
+                            keyData = keyData.k.base64UrlDecode();
+                        resolve(Cryptography.AesCryptoKey.import(keyData));
+                    }
+                    catch (e) {
+                        reject(e);
+                    }
+                }); },
+                sign: null,
+                unwrapKey: null,
+                verify: null,
+                wrapKey: null,
+            };
+        }
         try {
             window.crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, false, ["sign", "verify"]).catch(hook_ecdsa);
         }
