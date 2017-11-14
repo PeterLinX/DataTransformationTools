@@ -297,6 +297,43 @@ var AntShares;
             }
             return { result: BigInteger.create(sign_result, bits_result, true), remainder: BigInteger.create(bi_x._sign, bits_rem, true) };
         };
+        BigInteger.fromString = function (str, radix) {
+            if (radix === void 0) { radix = 10; }
+            var bi = Object.create(BigInteger.prototype);
+            bi.fromString(str, radix);
+            return bi;
+        };
+        BigInteger.prototype.fromString = function (str, radix) {
+            if (radix === void 0) { radix = 10; }
+            if (radix < 2 || radix > 36)
+                throw new RangeError();
+            if (str.length == 0) {
+                this._sign == 0;
+                this._bits = [];
+                return;
+            }
+            var bits_radix = [radix];
+            var bits_a = [0];
+            var first = str.charCodeAt(0);
+            var withsign = first == 0x2b || first == 0x2d;
+            this._sign = first == 0x2d ? -1 : +1;
+            this._bits = [];
+            for (var i = withsign ? 1 : 0; i < str.length; i++) {
+                bits_a[0] = str.charCodeAt(i);
+                if (bits_a[0] >= 0x30 && bits_a[0] <= 0x39)
+                    bits_a[0] -= 0x30;
+                else if (bits_a[0] >= 0x41 && bits_a[0] <= 0x5a)
+                    bits_a[0] -= 0x37;
+                else if (bits_a[0] >= 0x61 && bits_a[0] <= 0x7a)
+                    bits_a[0] -= 0x57;
+                else
+                    throw new RangeError();
+                var bits_temp = new Array();
+                BigInteger.multiplyTo(this._bits, bits_radix, bits_temp);
+                BigInteger.addTo(bits_temp, bits_a, this._bits);
+            }
+            this.clamp();
+        };
         BigInteger.fromUint8Array = function (arr, sign, littleEndian) {
             if (sign === void 0) { sign = 1; }
             if (littleEndian === void 0) { littleEndian = true; }

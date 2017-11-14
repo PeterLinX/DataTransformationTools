@@ -5,10 +5,13 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta charset="utf-8" />
     <style type="text/css">
+    .trans-area div{
+        margin: 5px auto;
+    }
     .trans-area b{
         display: inline-block;
         min-width: 90px\0;
-        min-width: 80px;
+        min-width: 85px;
     }
     .trans-area input{
         margin-right: 10px;
@@ -16,6 +19,7 @@
         vertical-align: baseline;
     }
     #transform{
+        margin-top: 10px;
         min-width: 150px;
         height: 35px;
         background: #d74717;
@@ -492,24 +496,36 @@ This standard defines two method types:
     <div class="container">
         <form class="trans-area">
             <div>
-                <b>String</b>：
-                <input id="inString" type="text" placeholder="7472616e73666572" />----> Type ：
-                <span id="outString"></span>
+                <b>Hex String</b>：
+                <input id="inString" type="text" placeholder="7472616e73666572" />----> String ：
+                <span id="outString" class="trans-text"></span>
             </div>
+            <div>
+                <b>String</b>：
+                <input id="inType" type="text" placeholder="transfer" />----> Hex String ：
+                <span id="outType" class="trans-text"></span>
+            </div>
+            <hr>
             <div>
                 <b>Script Hash</b>：
                 <input id="inHash" type="text" placeholder="d336d7eb9975a29b2404fdb28185e277a4b299bc" />----> Address ：
-                <span id="outHash"></span>
+                <span id="outHash" class="trans-text"></span>
             </div>
             <div>
                 <b>Address</b>：
                 <input id="inAddress" type="text" placeholder="AeV59NyZtgj5AMQ7vY6yhr2MRvcfFeLWSb" />----> Script Hash ：
-                <span id="outAddress"></span>
+                <span id="outAddress" class="trans-text"></span>
+            </div>
+            <hr>
+            <div>
+                <b>Hex Number</b>：
+                <input id="inCount" type="text" placeholder="006ad42d100100" />----> Number ： 
+                <span id="outCount" class="trans-text"></span>
             </div>
             <div>
                 <b>Number</b>：
-                <input id="inCount" type="text" placeholder="006ad42d100100" />----> Amount ： 
-                <span id="outCount"></span>
+                <input id="inAmount" type="text" placeholder="1169000000000" />----> Hex Number ：
+                <span id="outAmount" class="trans-text"></span>
             </div>
 
             <input id="transform" type="button" value="Transform">
@@ -519,59 +535,83 @@ This standard defines two method types:
     <script type="text/javascript" src="js/jquery.min.js"></script>
     <script type="text/javascript" src="strapdown/strapdown.js"></script>
     <script type="text/javascript" src="js/bundleDemo.js"></script>
-    <script>
-        $(function () {
-        var Trans = (function () {
-            function Trans() {
-            }
-            Trans.hexToString = function (hex) {
-                var trimhex = hex.trim();
-                var rawStr = trimhex.substr(0, 2).toLowerCase() === "0x" ? trimhex.substr(2) : trimhex;
-                var len = rawStr.length;
-                if (len % 2 !== 0) {
-                    alert("Illegal Format ASCII Code!");
-                    return "";
-                }
-                var cuChar;
-                var result = [];
-                for (var i = 0; i < len; i = i + 2) {
-                    cuChar = parseInt(rawStr.substr(i, 2), 16);
-                    result.push(String.fromCharCode(cuChar));
-                }
-                return result.join("");
-            };
-            Trans.prototype.hexToString = function (hex) {
-                return Trans.hexToString(hex);
-            };
-            return Trans;
-        }());
-        $("#transform").click(function () {
-            var inStr = $("#inString").val();
-            if (inStr) {
-                var outStr = Trans.hexToString(inStr);
-                $("#outString").text(outStr);
-            }
-            var inHa = $("#inHash").val();
-            if (inHa && AntShares.Uint160.parse(inHa)) {
-                var hash160 = AntShares.Uint160.parse(inHa);
-                AntShares.Wallets.Wallet.toAddress(hash160).then(function (val) {
-                    $("#outHash").text(val);
-                });
-            }
-            var inAdd = $("#inAddress").val();
-            if (inAdd) {
-                AntShares.Wallets.Wallet.toScriptHash(inAdd).then(function (val) {
-                    $("#outAddress").text(val.toString());
-                });
-            }
-            var inCou = $("#inCount").val();
-            if (inCou) {
-                var num = inCou.hexToBytes();
-                var a = new AntShares.BigInteger(num);
-                $("#outCount").text(a.toString());
-            }
-        });
-    });
+<script>
+      $(function () {
+          var Trans = (function () {
+              function Trans() {
+              }
+              Trans.hexToString = function (hex) {
+                  var trimhex = hex.trim();
+                  var rawStr = trimhex.substr(0, 2).toLowerCase() === "0x" ? trimhex.substr(2) : trimhex;
+                  var len = rawStr.length;
+                  if (len % 2 !== 0) {
+                      alert("Illegal Format ASCII Code!");
+                      return "";
+                  }
+                  var cuChar;
+                  var result = [];
+                  for (var i = 0; i < len; i = i + 2) {
+                      cuChar = parseInt(rawStr.substr(i, 2), 16);
+                      result.push(String.fromCharCode(cuChar));
+                  }
+                  return result.join("");
+              };
+              Trans.prototype.hexToString = function (hex) {
+                  return Trans.hexToString(hex);
+              };
+              Trans.stringToHex = function (str) {
+                  if (str === "")
+                      return "";
+                  var hexChar = [];
+                  for (var i = 0; i < str.length; i++) {
+                      hexChar.push((str.charCodeAt(i)).toString(16));
+                  }
+                  return hexChar.join("");
+              };
+              Trans.prototype.stringToHex = function (str) {
+                  return Trans.stringToHex(str);
+              };
+              return Trans;
+          }());
+          $("#transform").click(function () {
+              $(".trans-text").text("");
+              var inStr = $("#inString").val();
+              if (inStr) {
+                  var outStr = Trans.hexToString(inStr);
+                  $("#outString").text(outStr);
+              }
+              var inType = $("#inType").val();
+              if (inType) {
+                  $("#outType").text(Trans.stringToHex(inType));
+              }
+              var inHa = $("#inHash").val();
+              if (inHa) {
+                  if(inHa.length!=40){alert("Illegal Format Script Hash!");return;}
+                  var hash160 = AntShares.Uint160.parse(inHa);
+                  AntShares.Wallets.Wallet.toAddress(hash160).then(function (val) {
+                      $("#outHash").text(val);
+                  });
+              }
+              var inAdd = $("#inAddress").val();
+              if (inAdd) {
+                  if(inAdd.length!=34){alert("Illegal Format Address!");return;}
+                  AntShares.Wallets.Wallet.toScriptHash(inAdd).then(function (val) {
+                      $("#outAddress").text(val.toString());
+                  });
+              }
+              var inCou = $("#inCount").val();
+              if (inCou) {
+                  var num = inCou.hexToBytes();
+                  var a = new AntShares.BigInteger(num);
+                  $("#outCount").text(a.toString());
+              }
+              var inAmount = $("#inAmount").val();
+              if (inAmount) {
+                  var num = new AntShares.BigInteger(inAmount);
+                  $("#outAmount").text(num.toUint8Array().toHexString());
+              }
+          });
+      });
     </script>
 </body>
 </html>
