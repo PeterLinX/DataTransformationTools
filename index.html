@@ -497,34 +497,34 @@ This standard defines two method types:
         <form class="trans-area">
             <div>
                 <b>Hex String</b>：
-                <input id="inString" type="text" placeholder="7472616e73666572" />----> String ：
+                <input id="inString" type="text" placeholder="7472616e73666572" maxlength="50" />----> String ：
                 <span id="outString" class="trans-text"></span>
             </div>
             <div>
                 <b>String</b>：
-                <input id="inType" type="text" placeholder="transfer" />----> Hex String ：
+                <input id="inType" type="text" placeholder="transfer" maxlength="50"/>----> Hex String ：
                 <span id="outType" class="trans-text"></span>
             </div>
             <hr>
             <div>
                 <b>Script Hash</b>：
-                <input id="inHash" type="text" placeholder="d336d7eb9975a29b2404fdb28185e277a4b299bc" />----> Address ：
+                <input id="inHash" type="text" placeholder="d336d7eb9975a29b2404fdb28185e277a4b299bc" maxlength="50"/>----> Address ：
                 <span id="outHash" class="trans-text"></span>
             </div>
             <div>
                 <b>Address</b>：
-                <input id="inAddress" type="text" placeholder="AeV59NyZtgj5AMQ7vY6yhr2MRvcfFeLWSb" />----> Script Hash ：
+                <input id="inAddress" type="text" placeholder="AeV59NyZtgj5AMQ7vY6yhr2MRvcfFeLWSb" maxlength="50"/>----> Script Hash ：
                 <span id="outAddress" class="trans-text"></span>
             </div>
             <hr>
             <div>
                 <b>Hex Number</b>：
-                <input id="inCount" type="text" placeholder="006ad42d100100" />----> Number ： 
+                <input id="inCount" type="text" placeholder="006ad42d100100" maxlength="50"/>----> Number ： 
                 <span id="outCount" class="trans-text"></span>
             </div>
             <div>
                 <b>Number</b>：
-                <input id="inAmount" type="text" placeholder="1169000000000" />----> Hex Number ：
+                <input id="inAmount" type="text" placeholder="1169000000000" maxlength="50"/>----> Hex Number ：
                 <span id="outAmount" class="trans-text"></span>
             </div>
 
@@ -573,6 +573,18 @@ This standard defines two method types:
               };
               return Trans;
           }());
+          $("input").keyup(function(){
+                $(this).val($(this).val().replace(/[^A-Za-z0-9]/g,""));
+          });
+          $("#inAmount").keyup(function(){
+                $(this).val($(this).val().replace(/\D/g,""));
+          });
+          $("input").o'n(function(){
+                $(this).val($(this).val().replace(/[^A-Za-z0-9]/g,""));
+          });
+          $("#inAmount").keyup(function(){
+                $(this).val($(this).val().replace(/\D/g,""));
+          });
           $("#transform").click(function () {
               $(".trans-text").text("");
               var inStr = $("#inString").val();
