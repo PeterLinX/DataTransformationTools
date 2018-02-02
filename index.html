@@ -508,7 +508,7 @@ This standard defines two method types:
             <hr>
             <div>
                 <b>Script Hash</b>：
-                <input id="inHash" type="text" placeholder="d336d7eb9975a29b2404fdb28185e277a4b299bc" maxlength="50"/>----> Address ：
+                <input id="inHash" type="text" placeholder="0xd336d7eb9975a29b2404fdb28185e277a4b299bc" maxlength="50"/>----> Address ：
                 <span id="outHash" class="trans-text"></span>
             </div>
             <div>
@@ -607,6 +607,7 @@ This standard defines two method types:
               }
               var inHa = $("#inHash").val();
               if (inHa) {
+                  if(inHa.indexOf("0x")==0) inHa = inHa.slice(2);
                   if(inHa.length!=40){alert("Illegal Format Script Hash!");return;}
                   var hash160 = AntShares.Uint160.parse(inHa);
                   AntShares.Wallets.Wallet.toAddress(hash160).then(function (val) {
@@ -617,7 +618,7 @@ This standard defines two method types:
               if (inAdd) {
                   if(inAdd.length!=34){alert("Illegal Format Address!");return;}
                   AntShares.Wallets.Wallet.toScriptHash(inAdd).then(function (val) {
-                      $("#outAddress").text(val.toString());
+                      $("#outAddress").text("0x"+val.toString());
                   });
               }
               var inCou = $("#inCount").val();
