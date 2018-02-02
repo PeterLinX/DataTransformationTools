@@ -519,13 +519,21 @@ This standard defines two method types:
             <hr>
             <div>
                 <b>Hex Number</b>：
-                <input id="inCount" type="text" placeholder="006ad42d100100" maxlength="50"/>----> Number ： 
+                <input id="inCount" type="text" placeholder="006ad42d100100" maxlength="50"/>----> Number ：
                 <span id="outCount" class="trans-text"></span>
             </div>
             <div>
                 <b>Number</b>：
                 <input id="inAmount" type="text" placeholder="1169000000000" maxlength="50"/>----> Hex Number ：
                 <span id="outAmount" class="trans-text"></span>
+            </div>
+
+
+            <hr>
+            <div>
+                <b>Big-endian/Little-endian Address</b>：
+                <input id="inSmall" type="text" placeholder="0xd336d7eb9975a29b2404fdb28185e277a4b299bc" maxlength="50"/>----> Little-endian/Big-endian Address：
+                <span id="outSmall" class="trans-text"></span>
             </div>
 
             <input id="transform" type="button" value="Transform">
@@ -535,6 +543,7 @@ This standard defines two method types:
     <script type="text/javascript" src="js/jquery.min.js"></script>
     <script type="text/javascript" src="strapdown/strapdown.js"></script>
     <script type="text/javascript" src="js/bundleDemo.js"></script>
+    <!--<script type="text/javascript" src="js/appBundle.js"></script>-->
 <script>
       $(function () {
           var Trans = (function () {
@@ -622,6 +631,20 @@ This standard defines two method types:
                   var num = new AntShares.BigInteger(inAmount);
                   $("#outAmount").text(num.toUint8Array().toHexString());
               }
+              var inSmall = $("#inSmall").val(),result=[],num;
+              if (inSmall) {
+                  if(inSmall.indexOf("0x")==0) {inSmall = inSmall.slice(2);
+                  }else {result = ['0x'];}
+                  var smaArray = inSmall.hexToBytes().reverse();
+                  console.log(smaArray);
+                  for (var i = 0; i < smaArray.length; i++) {
+                      num = smaArray[i].toString(16);
+                      if (num<=16) num="0"+num;
+                      result.push(num);
+                  }
+                  $("#outSmall").text(result.join(""));
+              }
+
           });
       });
     </script>
