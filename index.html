@@ -496,47 +496,72 @@ This standard defines two method types:
     <div class="container">
         <form class="trans-area">
             <div>
+                <div>string: 7472616e73666572 - transfer</div>
                 <b>Hex String</b>：
                 <input id="inString" type="text" placeholder="7472616e73666572" maxlength="50" />----> String ：
                 <span id="outString" class="trans-text"></span>
             </div>
             <div>
                 <b>String</b>：
-                <input id="inType" type="text" placeholder="transfer" maxlength="50"/>----> Hex String ：
-                <span id="outType" class="trans-text"></span>
+                <input id="inHexString" type="text" placeholder="transfer" maxlength="50" />----> Hex String ：
+                <span id="outHexString" class="trans-text"></span>
             </div>
-            <hr>
+            <input id="transform1" type="button" value="Transform">
+        </form>
+        <hr />
+        <form class="trans-area">
             <div>
-                <b>Script Hash</b>：
-                <input id="inHash" type="text" placeholder="d336d7eb9975a29b2404fdb28185e277a4b299bc" maxlength="50"/>----> Address ：
-                <span id="outHash" class="trans-text"></span>
+                <div>address(big endian): 0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9 - AeV59NyZtgj5AMQ7vY6yhr2MRvcfFeLWSb</div>
+                <b>Script Hash</b>： 0x
+                <input id="inXScriptHash" type="text" placeholder="ecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9" maxlength="50" />----> Address ：
+                <span id="outXScriptHash" class="trans-text"></span>
             </div>
             <div>
                 <b>Address</b>：
-                <input id="inAddress" type="text" placeholder="AeV59NyZtgj5AMQ7vY6yhr2MRvcfFeLWSb" maxlength="50"/>----> Script Hash ：
+                <input id="inXAddress" type="text" placeholder="AeV59NyZtgj5AMQ7vY6yhr2MRvcfFeLWSb" maxlength="50" />----> Script Hash ： 0x
+                <span id="outXAddress" class="trans-text"></span>
+            </div>
+            <input id="transform2" type="button" value="Transform">
+        </form>
+        <hr />
+        <form class="trans-area">
+            <div>
+                <div>address(little endian): d336d7eb9975a29b2404fdb28185e277a4b299bc - Ab2fvZdmnM4HwDgVbdBrbTLz1wK5TcEyhU</div>
+                <b>Script Hash</b>：
+                <input id="inScriptHash" type="text" placeholder="d336d7eb9975a29b2404fdb28185e277a4b299bc" maxlength="50" />----> Address ：
+                <span id="outScriptHash" class="trans-text"></span>
+            </div>
+            <div>
+                <b>Address</b>：
+                <input id="inAddress" type="text" placeholder="Ab2fvZdmnM4HwDgVbdBrbTLz1wK5TcEyhU" maxlength="50" />----> Script Hash ：
                 <span id="outAddress" class="trans-text"></span>
             </div>
-            <hr>
+            <input id="transform3" type="button" value="Transform">
+        </form>
+        <hr />
+        <form class="trans-area">
             <div>
+                <div>number: 00e1f505 - 100000000</div>
                 <b>Hex Number</b>：
-                <input id="inCount" type="text" placeholder="006ad42d100100" maxlength="50"/>----> Number ：
-                <span id="outCount" class="trans-text"></span>
+                <input id="inHexNum" type="text" placeholder="00e1f505" maxlength="50" />----> Number ：
+                <span id="outHexNum" class="trans-text"></span>
             </div>
             <div>
-                <b>Number</b>：
-                <input id="inAmount" type="text" placeholder="1169000000000" maxlength="50"/>----> Hex Number ：
-                <span id="outAmount" class="trans-text"></span>
+                <b>number</b>：
+                <input id="inNum" type="text" placeholder="100000000" maxlength="50" />----> Hex Number ：
+                <span id="outNum" class="trans-text"></span>
             </div>
-
-
-            <hr>
+            <input id="transform4" type="button" value="Transform">
+        </form>
+        <hr />
+        <form class="trans-area">
             <div>
+                <div>address: d336d7eb9975a29b2404fdb28185e277a4b299bc - 0xbc99b2a477e28581b2fd04249ba27599ebd736d3</div>
                 <b>Big-endian/Little-endian Address</b>：
-                <input id="inSmall" type="text" placeholder="d336d7eb9975a29b2404fdb28185e277a4b299bc" maxlength="50"/>----> Little-endian/Big-endian Address：
+                <input id="inSmall" type="text" placeholder="d336d7eb9975a29b2404fdb28185e277a4b299bc" maxlength="50" />----> Little-endian/Big-endian Address：
                 <span id="outSmall" class="trans-text"></span>
             </div>
-
-            <input id="transform" type="button" value="Transform">
+            <input id="transform5" type="button" value="Transform">
         </form>
     </div>
 
@@ -594,52 +619,78 @@ This standard defines two method types:
           $("#inAmount").keyup(function(){
                 $(this).val($(this).val().replace(/\D/g,""));
           });
-          $("#transform").click(function () {
-              $(".trans-text").text("");
-              var inStr = $("#inString").val();
+          $("#transform1").click(function () {//string
+            var inStr = $("#inString").val();
               if (inStr) {
                   var outStr = Trans.hexToString(inStr);
                   $("#outString").text(outStr);
               }
-              var inType = $("#inType").val();
-              if (inType) {
-                  $("#outType").text(Trans.stringToHex(inType));
+              var inHexString = $("#inHexString").val();
+              if (inHexString) {
+                  $("#outHexString").text(Trans.stringToHex(inHexString));
               }
-              var inHa = $("#inHash").val();
-              if (inHa) {
-                  if(inHa.indexOf("0x")!=0) inHa = endianChange(inHa);
-                  inHa = inHa.slice(2);
-                  if(inHa.length!=40){alert("Illegal Format Script Hash!");return;}
-                  var hash160 = AntShares.Uint160.parse(inHa);
+          });
+          $("#transform2").click(function () {//address(big endian)
+            var inXScriptHash = $("#inXScriptHash").val();
+              if (inXScriptHash) {
+                  if(inXScriptHash.substr(0, 2)=="0x")inXScriptHash = inXScriptHash.slice(2);
+                  if(inXScriptHash.length!=40){alert("Illegal Format Script Hash!");return;}
+                  var hash160 = AntShares.Uint160.parse(inXScriptHash);
                   AntShares.Wallets.Wallet.toAddress(hash160).then(function (val) {
-                      $("#outHash").text(val);
+                      $("#outXScriptHash").text(val);
                   });
               }
-              var inAdd = $("#inAddress").val();
-              if (inAdd) {
-                  if(inAdd.length!=34){alert("Illegal Format Address!");return;}
-                  AntShares.Wallets.Wallet.toScriptHash(inAdd).then(function (val) {
-                      $("#outAddress").text("0x"+val.toString());
+              var inXAddress = $("#inXAddress").val();
+              if (inXAddress) {
+                  if(inXAddress.length!=34){alert("Illegal Format Address!");return;}
+                  AntShares.Wallets.Wallet.toScriptHash(inXAddress).then(function (val) {
+                      $("#outXAddress").text(val.toString());
                   });
               }
-              var inCou = $("#inCount").val();
-              if (inCou) {
-                  var num = inCou.hexToBytes();
+          });
+          $("#transform3").click(function () {//address(little endian)
+            var inScriptHash = $("#inScriptHash").val();
+              if (inScriptHash) {
+                  if(inScriptHash.substr(0, 2)=="0x"){alert("This is big endian Script Hash!");return;}
+                  if(inScriptHash.length!=40){alert("Illegal Format Script Hash!");return;}
+                  var xScriptHash = endianChange(inScriptHash);
+                  if(xScriptHash.substr(0, 2)=="0x")xScriptHash = xScriptHash.slice(2);
+                  var hash160 = AntShares.Uint160.parse(xScriptHash);
+                  AntShares.Wallets.Wallet.toAddress(hash160).then(function (val) {
+                      $("#outScriptHash").text(val);
+                  });
+              }
+              var inAddress = $("#inAddress").val();
+              if (inAddress) {
+                  if(inAddress.length!=34){alert("Illegal Format Address!");return;}
+                  AntShares.Wallets.Wallet.toScriptHash(inAddress).then(function (val) {
+                      var xScriptHash = "0x" + val.toString();
+                      var scriptHash = endianChange(xScriptHash);
+                      $("#outAddress").text(scriptHash);
+                  });
+              }
+          });
+          $("#transform4").click(function () {//number
+            var inHexNum = $("#inHexNum").val();
+              if (inHexNum) {
+                  var num = inHexNum.hexToBytes();
                   var a = new AntShares.BigInteger(num);
-                  $("#outCount").text(a.toString());
+                  $("#outHexNum").text(a.toString());
               }
-              var inAmount = $("#inAmount").val();
-              if (inAmount) {
-                  var num = new AntShares.BigInteger(inAmount);
-                  $("#outAmount").text(num.toUint8Array().toHexString());
+              var inNum = $("#inNum").val();
+              if (inNum) {
+                  var num = new AntShares.BigInteger(inNum);
+                  $("#outNum").text(num.toUint8Array().toHexString());
               }
+          });
+          $("#transform5").click(function () {//address
+              $(".trans-text").text("");              
               var inSmall = $("#inSmall").val()
               if (inSmall) {
                   if(inSmall.length!=40&&inSmall.length!=42){alert("Illegal Format Endian Address!");return;}
                   $("#outSmall").text(endianChange(inSmall));
               }
           });
-          
           function endianChange(inSmall) {
               var result=[],num;
               if(inSmall.indexOf("0x")==0) {inSmall = inSmall.slice(2);
@@ -652,7 +703,6 @@ This standard defines two method types:
               }
               return result.join("");
           }
-
       });
     </script>
 </body>
