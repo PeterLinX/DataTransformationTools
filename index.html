@@ -508,7 +508,7 @@ This standard defines two method types:
             <hr>
             <div>
                 <b>Script Hash</b>：
-                <input id="inHash" type="text" placeholder="0xd336d7eb9975a29b2404fdb28185e277a4b299bc" maxlength="50"/>----> Address ：
+                <input id="inHash" type="text" placeholder="d336d7eb9975a29b2404fdb28185e277a4b299bc" maxlength="50"/>----> Address ：
                 <span id="outHash" class="trans-text"></span>
             </div>
             <div>
@@ -532,7 +532,7 @@ This standard defines two method types:
             <hr>
             <div>
                 <b>Big-endian/Little-endian Address</b>：
-                <input id="inSmall" type="text" placeholder="0xd336d7eb9975a29b2404fdb28185e277a4b299bc" maxlength="50"/>----> Little-endian/Big-endian Address：
+                <input id="inSmall" type="text" placeholder="d336d7eb9975a29b2404fdb28185e277a4b299bc" maxlength="50"/>----> Little-endian/Big-endian Address：
                 <span id="outSmall" class="trans-text"></span>
             </div>
 
@@ -607,7 +607,8 @@ This standard defines two method types:
               }
               var inHa = $("#inHash").val();
               if (inHa) {
-                  if(inHa.indexOf("0x")==0) inHa = inHa.slice(2);
+                  if(inHa.indexOf("0x")!=0) inHa = endianChange(inHa);
+                  inHa = inHa.slice(2);
                   if(inHa.length!=40){alert("Illegal Format Script Hash!");return;}
                   var hash160 = AntShares.Uint160.parse(inHa);
                   AntShares.Wallets.Wallet.toAddress(hash160).then(function (val) {
@@ -632,21 +633,26 @@ This standard defines two method types:
                   var num = new AntShares.BigInteger(inAmount);
                   $("#outAmount").text(num.toUint8Array().toHexString());
               }
-              var inSmall = $("#inSmall").val(),result=[],num;
+              var inSmall = $("#inSmall").val()
               if (inSmall) {
-                  if(inSmall.indexOf("0x")==0) {inSmall = inSmall.slice(2);
-                  }else {result = ['0x'];}
-                  var smaArray = inSmall.hexToBytes().reverse();
-                  console.log(smaArray);
-                  for (var i = 0; i < smaArray.length; i++) {
-                      num = smaArray[i].toString(16);
-                      if (num<=16) num="0"+num;
-                      result.push(num);
-                  }
-                  $("#outSmall").text(result.join(""));
+                  if(inSmall.length!=40&&inSmall.length!=42){alert("Illegal Format Endian Address!");return;}
+                  $("#outSmall").text(endianChange(inSmall));
               }
-
           });
+          
+          function endianChange(inSmall) {
+              var result=[],num;
+              if(inSmall.indexOf("0x")==0) {inSmall = inSmall.slice(2);
+              }else {result = ['0x'];}
+              var smaArray = inSmall.hexToBytes().reverse();
+              for (var i = 0; i < smaArray.length; i++) {
+                  num = smaArray[i].toString(16);
+                  if (num<=16) num="0"+num;
+                  result.push(num);
+              }
+              return result.join("");
+          }
+
       });
     </script>
 </body>
