@@ -33,8 +33,12 @@
     .trans-area .trans-ex{
         margin-bottom: 10px;
     }
-    .trans-area input[type=button]{
+    .trans-area input[type=button],
+    .search-area input[type=button]{
+        margin-right: 10px;
         margin-top: 10px;
+        min-width: 200px;
+        vertical-align: baseline;
         background: #c33302;
         height: 35px;
         color: #ffffff;
@@ -45,6 +49,30 @@
     input::-webkit-input-placeholder {color:#ccc;}
     input::-moz-placeholder {color:#ccc;}
     input::-ms-input-placeholder {color:#ccc;}
+    .script-left{
+        display: inline-block;
+        border-right: 1px solid #f5f5f5;
+        padding: 20px 50px 20px 0;
+    }
+    .script-left b{
+        display: inline-block;
+        min-width: 150px;
+    }
+    .script-left input{
+        margin-top: 10px;
+    }
+    .script-right{
+        display: inline-block;
+        max-width: 420px;
+        vertical-align: top;
+        padding: 30px 0 20px 50px;
+    }
+    .script-right span{
+        word-break: break-all;
+    }
+    .script-right span[id^="outscript"]{
+        /*visibility: hidden;*/
+    }
 </style>
 </head>
 <body>
@@ -126,6 +154,26 @@
             </div>
             <input id="transform5" type="button" value="Transform">
         </form>
+        <hr />
+        <form class="search-area">
+            <div>
+                <div>转账脚本Script生成：</div>
+                <div class="script-left">
+                    <div class="trans-ex"><b>From：</b><input placeholder="AV8hdNibrG7r8fdVKSY6AgeHnssKQ1Smg8" type="text" id="trans1"></div>
+                    <div class="trans-ex"><b>To：</b><input placeholder="AHsEeUnSY9Kk7fba5MCXWSgZeyZNtWSv9x" type="text" id="trans2"></div>
+                    <div class="trans-ex"><b>Amount：</b><input placeholder="1100000000" type="text" id="trans3"></div>
+                    <div class="trans-ex"><b>Contract Scripthash：</b><input placeholder="0x56c346b95bec05bd9e641c82b84bc229be6fe629" type="text" id="trans4"></div>
+                 </div>
+                <div class="script-right">
+                    <span id="outScr"></span>
+                    <span id="outscript1"></span>
+                    <span id="outscript2"></span>
+                    <span id="outscript3"></span>
+                    <span id="outscript4"></span>
+                </div>
+            </div>
+            <input id="transscript" type="button" value="Transform">
+        </form>
     </div>
 
     <script type="text/javascript" src="js/jquery.min.js"></script>
@@ -151,7 +199,7 @@
                       cuChar = parseInt(rawStr.substr(i, 2), 16);
                       result.push(String.fromCharCode(cuChar));
                   }
-                  return result.join("");
+                  return result;
               };
               Trans.prototype.hexToString = function (hex) {
                   return Trans.hexToString(hex);
@@ -163,7 +211,7 @@
                   for (var i = 0; i < str.length; i++) {
                       hexChar.push((str.charCodeAt(i)).toString(16));
                   }
-                  return hexChar.join("");
+                  return hexChar;
               };
               Trans.prototype.stringToHex = function (str) {
                   return Trans.stringToHex(str);
@@ -185,12 +233,12 @@
           $("#transform1").click(function () {//string
             var inStr = $("#inString").val();
               if (inStr) {
-                  var outStr = Trans.hexToString(inStr);
+                  var outStr = Trans.hexToString(inStr).join("");
                   $("#outString").text(outStr);
               }
               var inHexString = $("#inHexString").val();
               if (inHexString) {
-                  $("#outHexString").text(Trans.stringToHex(inHexString));
+                  $("#outHexString").text(Trans.stringToHex(inHexString).join(""));
               }
           });
           $("#transform2").click(function () {//address(big endian)
@@ -266,9 +314,58 @@
                       num="0"+num;
                   }else {num = smaArray[i].toString(16);}
                   result.push(num);
-                  console.log(result);
               }
               return result.join("");
+          }
+          
+          $("#transscript").click(function () {
+              ad2endian($("#trans1").val(),1);
+              ad2endian($("#trans2").val(),2);
+              amount2hash($("#trans3").val());
+              var trans1 = $("#outscript1").text();
+              var trans2 = $("#outscript2").text();
+              var trans3 = $("#outscript3").text();
+              var trans4 = endianChange($("#trans4").val());
+              $("#outscript4").text(trans4);
+//              $("#outScr").text(trans1+trans2+trans3+trans4);
+//              setTimeout(function(){
+//                  console.log(trans1);
+//                  console.log(trans2);
+//                  console.log(trans3);
+//                  console.log(trans4);
+//                  $("#outScr").text(trans1+trans2+trans3+trans4);
+//              },100);
+          });
+
+          function ad2endian(hash,num) {
+              if (hash!="") {
+                  if(hash.length!=34){alert("Illegal Format Address!");return;}
+                  AntShares.Wallets.Wallet.toScriptHash(hash).then(function (val) {
+                      var xScriptHash = "0x" + val.toString();
+                      var res = endianChange(xScriptHash);
+                      var length = (res.length/2).toString(16);
+                      if(num==1){$("#outscript1").text(length+res);}
+                      else {$("#outscript2").text(length+res);}
+                  });
+              }
+          }
+          function amount2hash(num){
+              if (num) {
+                  var hexnum = new AntShares.BigInteger(num);
+                  var str = hexnum.toUint8Array().toHexString();
+                  var len = getLength(str)+str;
+                  $("#outscript3").text(len);
+              }
+          }
+          
+          function getLength(len) {
+              var _len = len.toString().length/2;
+              if(_len<16){
+                  _len = "0"+_len.toString(16);
+              }else {
+                  _len = _len.toString(16);
+              }
+              return _len;
           }
       });
     </script>
