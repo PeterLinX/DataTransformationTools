@@ -581,7 +581,7 @@ This standard defines two method types:
     <script type="text/javascript" src="strapdown/strapdown.js"></script>
     <script type="text/javascript" src="js/bundleDemo.js"></script>
     <!--<script type="text/javascript" src="js/appBundle.js"></script>-->
-<script>
+    <script>
       $(function () {
           var Trans = (function () {
               function Trans() {
@@ -710,11 +710,12 @@ This standard defines two method types:
               var smaArray = inSmall.hexToBytes().reverse();
               for (var i = 0; i < smaArray.length; i++) {
                   num = smaArray[i];
-                  if (num<=16) {
+                  if (num<16) {
                       num = smaArray[i].toString(16);
                       num="0"+num;
                   }else {num = smaArray[i].toString(16);}
                   result.push(num);
+                  console.log(result);
               }
               return result.join("");
           }
