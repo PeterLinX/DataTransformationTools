@@ -163,7 +163,7 @@
                 <div class="script-left">
                     <div class="trans-ex"><b>From：</b><input placeholder="AV8hdNibrG7r8fdVKSY6AgeHnssKQ1Smg8" type="text" id="trans1"></div>
                     <div class="trans-ex"><b>To：</b><input placeholder="AHsEeUnSY9Kk7fba5MCXWSgZeyZNtWSv9x" type="text" id="trans2"></div>
-                    <div class="trans-ex"><b>Amount：</b><input placeholder="1100000000" type="text" id="trans3"></div>
+                    <div class="trans-ex"><b>Amount：</b><input placeholder="11" type="text" id="trans3"> * 10<sup>8</sup></div>
                     <div class="trans-ex"><b>Contract Scripthash：</b><input placeholder="0x56c346b95bec05bd9e641c82b84bc229be6fe629" type="text" id="trans4"></div>
                  </div>
                 <div class="script-right">
@@ -350,7 +350,7 @@
           }
           function amount2hash(num){
               if (num) {
-                  var hexnum = new AntShares.BigInteger(num);
+                  var hexnum = new AntShares.BigInteger(num*100000000);
                   var str = hexnum.toUint8Array().toHexString();
                   var len = getLength(str)+str;
                   return len;
