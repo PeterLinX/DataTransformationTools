@@ -71,7 +71,10 @@
         word-break: break-all;
     }
     .script-right span[id^="outscript"]{
-        /*visibility: hidden;*/
+        display: none;
+    }
+    .null-input{
+        border: 1px solid #c33302!important;
     }
 </style>
 </head>
@@ -157,7 +160,6 @@
         <hr />
         <form class="search-area">
             <div>
-                <div>转账脚本Script生成：</div>
                 <div class="script-left">
                     <div class="trans-ex"><b>From：</b><input placeholder="AV8hdNibrG7r8fdVKSY6AgeHnssKQ1Smg8" type="text" id="trans1"></div>
                     <div class="trans-ex"><b>To：</b><input placeholder="AHsEeUnSY9Kk7fba5MCXWSgZeyZNtWSv9x" type="text" id="trans2"></div>
@@ -169,7 +171,6 @@
                     <span id="outscript1"></span>
                     <span id="outscript2"></span>
                     <span id="outscript3"></span>
-                    <span id="outscript4"></span>
                 </div>
             </div>
             <input id="transscript" type="button" value="Transform">
@@ -227,7 +228,7 @@
           $("input").on(function(){
                 $(this).val($(this).val().replace(/[^A-Za-z0-9]/g,""));
           });
-          $("#inAmount").keyup(function(){
+          $("#inAmount").on(function(){
                 $(this).val($(this).val().replace(/\D/g,""));
           });
           $("#transform1").click(function () {//string
@@ -296,7 +297,7 @@
           });
           $("#transform5").click(function () {//address
               $(".trans-text").text("");              
-              var inSmall = $("#inSmall").val()
+              var inSmall = $("#inSmall").val();
               if (inSmall) {
                   if(inSmall.length!=40&&inSmall.length!=42){alert("Illegal Format Endian Address!");return;}
                   $("#outSmall").text(endianChange(inSmall));
@@ -305,7 +306,7 @@
           function endianChange(inSmall) {
               var result=[],num;
               if(inSmall.indexOf("0x")==0) {inSmall = inSmall.slice(2);
-              }else {result = ['0x'];}
+              }else if(inSmall){result = ['0x'];}
               var smaArray = inSmall.hexToBytes().reverse();
               for (var i = 0; i < smaArray.length; i++) {
                   num = smaArray[i];
@@ -319,26 +320,24 @@
           }
           
           $("#transscript").click(function () {
-              ad2endian($("#trans1").val(),1);
-              ad2endian($("#trans2").val(),2);
-              amount2hash($("#trans3").val());
-              var trans1 = $("#outscript1").text();
-              var trans2 = $("#outscript2").text();
-              var trans3 = $("#outscript3").text();
-              var trans4 = endianChange($("#trans4").val());
-              $("#outscript4").text(trans4);
-//              $("#outScr").text(trans1+trans2+trans3+trans4);
-//              setTimeout(function(){
-//                  console.log(trans1);
-//                  console.log(trans2);
-//                  console.log(trans3);
-//                  console.log(trans4);
-//                  $("#outScr").text(trans1+trans2+trans3+trans4);
-//              },100);
+              var allfill = true;
+              $(this).parent("form").find("input").each(function () {
+                  if(!$(this).val()){allfill=false;alert("Please fill all content!");return false;}
+              });
+              if(allfill){
+                  ad2LittleEndian($("#trans1").val(),1);
+                  ad2LittleEndian($("#trans2").val(),2);
+                  var trans3 = amount2hash($("#trans3").val())||"";
+                  var trans4 = endianChange($("#trans4").val())||"";
+                  setTimeout(function(){
+                      var trans1 = $("#outscript1").text()||"";
+                      var trans2 = $("#outscript2").text()||"";
+                      $("#outScr").text(trans1+trans2+trans3+trans4);
+                  },0);
+              }
           });
-
-          function ad2endian(hash,num) {
-              if (hash!="") {
+          function ad2LittleEndian(hash,num) {
+              if (hash) {
                   if(hash.length!=34){alert("Illegal Format Address!");return;}
                   AntShares.Wallets.Wallet.toScriptHash(hash).then(function (val) {
                       var xScriptHash = "0x" + val.toString();
@@ -354,7 +353,7 @@
                   var hexnum = new AntShares.BigInteger(num);
                   var str = hexnum.toUint8Array().toHexString();
                   var len = getLength(str)+str;
-                  $("#outscript3").text(len);
+                  return len;
               }
           }
           
