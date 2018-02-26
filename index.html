@@ -329,10 +329,12 @@
                   ad2LittleEndian($("#trans2").val(),2);
                   var trans3 = amount2hash($("#trans3").val())||"";
                   var trans4 = endianChange($("#trans4").val())||"";
+                  var trans5 = "53c1";
+                  var trans6 = "087472616e7366657267";
                   setTimeout(function(){
                       var trans1 = $("#outscript1").text()||"";
                       var trans2 = $("#outscript2").text()||"";
-                      $("#outScr").text(trans3+trans2+trans1+trans4);
+                      $("#outScr").text(trans3+trans2+trans1+trans5+trans6+trans4);
                   },0);
               }
           });
