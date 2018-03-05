@@ -353,7 +353,7 @@
           function amount2hash(num){
               if (num) {
                   var hexnum = new AntShares.BigInteger(num*100000000);
-                  var str = hexnum.toUint8Array().toHexString();
+                  var str = hexnum.toUint8Array().toHexString()+"00";
                   var len = getLength(str)+str;
                   return len;
               }
